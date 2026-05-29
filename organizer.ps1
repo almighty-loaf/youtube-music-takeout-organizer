@@ -16,7 +16,7 @@ param (
 # unless specified here
 #
 # You may add more entries here as needed for your own music library
-$albumArtistsWithSpecialChars = @(
+$artistNamesWithSpecialChars = @(
     "AC/DC",
     "Earth, Wind & Fire"
 )
@@ -182,7 +182,7 @@ foreach ($row in $csvData) {
     # Skip artists with commas or slashes in their name that aren't
     # in the allowed list, since these need to be fixed manually
     if (Test-ArtistNameContainsSpecialChars $csvArtistName `
-            -and -not ($albumArtistsWithSpecialChars -contains $csvArtistName)) {
+            -and -not ($artistNamesWithSpecialChars -contains $csvArtistName)) {
         if ($ShowWarnings) { Write-Warning "Skipping artist with comma not in allowed list: $csvArtistName" }
         $numFilesSkipped++
         continue
