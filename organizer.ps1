@@ -11,9 +11,9 @@ param (
 # CONFIGURATION
 #############################################
 
-# If the "Artist Name 1" column contains commas, slashes, ampersands, or semicolons, they are probably
-# delimiters for contributing artists. We only care about album artists, so we will ignore these rows
-# unless specified here
+# If the "Artist Name 1" column of the CSV contains commas, slashes, ampersands, or semicolons, they are 
+# probably delimiters for contributing artists. We only care about album artists, so we will ignore these 
+# rows unless specified here
 #
 # You may add more entries here as needed for your own music library
 $artistNamesWithSpecialChars = @(
@@ -158,7 +158,7 @@ try {
     $shell = New-Object -ComObject Shell.Application
 }
 catch {
-    Write-Error "Running on non-Windows host. Existing file metadata won't be considered when there are multiple files with the same name."
+    Write-Warning "Running on non-Windows host. Existing file metadata won't be considered when there are multiple files with the same name."
 }
 
 
@@ -207,11 +207,15 @@ foreach ($row in $csvData) {
     $targetFile = $null
 
     # 3. Filter using metadata as needed
-    if ($safeTitleCounts[$safesafeSongTitle] -eq 1 -and $candidates.Count -eq 1) {
+
+    # If there's only one candidate, use it. Requiring the map count to agree helps
+    # prevent false positives in a partially-organized dataset
+    if ($candidates.Count -eq 1 -and $safeTitleCounts[$safesafeSongTitle] -eq 1) {
         $targetFile = $candidates[0]
     }
-    else {
-        # If there's more than one candidate, we can check against the CSV metadata        
+
+    # If there's more than one candidate, we can check against the CSV metadata  
+    else {              
         $csvSeconds = Convert-CsvDurationToSeconds $csvDuration
 
         foreach ($file in $candidates) {
