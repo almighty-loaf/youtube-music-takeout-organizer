@@ -1,9 +1,7 @@
+[CmdletBinding()]
 param (
     [Parameter(Mandatory = $true)]
-    [string]$MusicPath,
-
-    [Parameter()]
-    [bool]$ShowWarnings = $false
+    [string]$MusicPath
 )
 
 
@@ -28,6 +26,7 @@ $artistNamesWithSpecialChars = @(
 
 # Regex pattern that represent characters that YTM replaces with underscores in file names
 # e.g. song title "Who can it be now?" is "Who can it be now_.mp3"
+# Hardcode to the Windows limitations since that's what the source data abides by
 function UnderscoreCharsRegex {
     '[\\/:*?"''<>|]'
 }
@@ -103,9 +102,10 @@ function Convert-ShellDurationToSeconds {
 }
 
 # Function to sanitize file or folder names by replacing invalid characters with underscores
+# and removing trailing dots and spaces (since those are not allowed in Windows file/folder names)
 function ConvertTo-SafeFileOrFolderName {
-    param ([string]$name)
-    return ($name -replace (UnderscoreCharsRegex), '_')
+    param ([string]$name)    
+    return ($name -replace (UnderscoreCharsRegex), '_').TrimEnd('.', ' ')
 }
 
 # Function that calculates the count of unique song titles after they have been sanitized
@@ -166,7 +166,10 @@ catch {
 # MAIN PROCESSING LOOP
 #############################################
 
+$rowIndex = 0   # starting at 0 allows the first run of the loop to increment past the header row
 foreach ($row in $csvData) {
+    $rowIndex++
+
     # 1. Extract and Sanitize Data
     $csvsafeSongTitle = $row.'Song Title'
     $csvAlbumTitle = $row.'Album Title'
@@ -175,6 +178,7 @@ foreach ($row in $csvData) {
 
     # Require at least Song Title and Artist Name for matching
     if (-not $csvsafeSongTitle -or -not $csvArtistName) { 
+        Write-Verbose "Skipping song with missing title or artist, see CSV row $rowIndex" 
         $numFilesSkipped++ 
         continue 
     }
@@ -183,7 +187,7 @@ foreach ($row in $csvData) {
     # in the allowed list, since these need to be fixed manually
     if (Test-ArtistNameContainsSpecialChars $csvArtistName `
             -and -not ($artistNamesWithSpecialChars -contains $csvArtistName)) {
-        if ($ShowWarnings) { Write-Warning "Skipping artist with comma not in allowed list: $csvArtistName" }
+        Write-Verbose "Skipping song with apparent list of artists: $csvArtistName"
         $numFilesSkipped++
         continue
     }
@@ -199,7 +203,7 @@ foreach ($row in $csvData) {
     $candidates = $musicFiles | Where-Object { $_.BaseName -match "^$escapedTitle(\(\d+\))?$" }
 
     if (-not $candidates) {
-        if ($ShowWarnings) { Write-Warning "No file candidates found for: $csvsafeSongTitle" }
+        Write-Verbose "No file candidates found for: $csvsafeSongTitle"
         $numFilesNotFound++
         continue
     }
@@ -259,22 +263,28 @@ foreach ($row in $csvData) {
     if ($targetFile) {
         $destPath = Join-Path $MusicPath $safeArtist $safeAlbum
 
-        if (-not (Test-Path $destPath)) {
-            New-Item -ItemType Directory -Path $destPath -Force | Out-Null
-        }
+        # if (-not(Test-Path $destPath -IsValid)) {
+        #     Write-Error "Skipping song with invalid destination path: $destPath."
+        #     $numFilesErrored++
+        #     continue
+        # }
 
         try {
-            Move-Item -Path $targetFile.FullName -Destination $destPath -Force
+            if (-not (Test-Path $destPath)) {
+                New-Item -ItemType Directory -Path $destPath | Out-Null
+            }
+
+            Move-Item -Path $targetFile.FullName -Destination $destPath #-Force
             # Write-Host "Moved: $($targetFile.Name) -> $safeArtist\$safeAlbum"
             $numFilesOrganized++
         }
         catch {
-            Write-Error "Failed to move $($targetFile.Name): $_"
+            Write-Error "Failed to move song to $destPath"
             $numFilesErrored++
         }
     }
     else {
-        if ($ShowWarnings) { Write-Warning "No valid file match found for: $csvsafeSongTitle" }
+        Write-Verbose "No valid file match found for: $csvsafeSongTitle"
         $numFilesNotFound++
     }
 }
