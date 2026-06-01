@@ -185,7 +185,7 @@ foreach ($row in $csvData) {
 
     # Skip artists with commas or slashes in their name that aren't
     # in the allowed list, since these need to be fixed manually
-    if (Test-ArtistNameContainsSpecialChars $csvArtistName `
+    if ((Test-ArtistNameContainsSpecialChars $csvArtistName) `
             -and -not ($artistNamesWithSpecialChars -contains $csvArtistName)) {
         Write-Verbose "Skipping song with apparent list of artists: $csvArtistName"
         $numFilesSkipped++
@@ -263,18 +263,12 @@ foreach ($row in $csvData) {
     if ($targetFile) {
         $destPath = Join-Path $MusicPath $safeArtist $safeAlbum
 
-        # if (-not(Test-Path $destPath -IsValid)) {
-        #     Write-Error "Skipping song with invalid destination path: $destPath."
-        #     $numFilesErrored++
-        #     continue
-        # }
-
         try {
             if (-not (Test-Path $destPath)) {
                 New-Item -ItemType Directory -Path $destPath | Out-Null
             }
 
-            Move-Item -Path $targetFile.FullName -Destination $destPath #-Force
+            Move-Item -Path $targetFile.FullName -Destination $destPath -Force -ErrorAction Stop
             # Write-Host "Moved: $($targetFile.Name) -> $safeArtist\$safeAlbum"
             $numFilesOrganized++
         }
