@@ -46,7 +46,7 @@ catch {
 # MAIN PROCESSING LOOP
 #############################################
 
-$rowIndex = 0   # starting at 0 allows the first run of the loop to increment past the header row
+$rowIndex = 1   # starting at 1 allows the first run of the loop to increment past the header row (basically element 0 is row 2)
 foreach ($row in $csvData) {
     $rowIndex++
 
@@ -80,9 +80,8 @@ foreach ($row in $csvData) {
         #Write-Verbose "Skipping song with apparent list of artists: $csvArtistName"
         #$numFilesSkipped++
 
-        Write-Verbose "Treating ""$csvArtistName"" as ""Various Artists"""
+        Write-Verbose "Row $rowIndex - Treating ""$csvArtistName"" as ""Various Artists"""
         $csvArtistName = "Various Artists"
-        continue
     }
 
     # Sanitize for file system matching and folder creation
@@ -165,7 +164,7 @@ foreach ($row in $csvData) {
 
             Move-Item -LiteralPath $targetFile.FullName -Destination $destPath -Force -ErrorAction Stop -WarningAction Stop
             
-            Write-Debug "Moved: $($targetFile.Name) -> $safeArtist\$safeAlbum"
+            Write-Debug "Row $rowIndex - Moved: $($targetFile.Name) -> $safeArtist\$safeAlbum"
             
             $numFilesOrganized++
         }
@@ -175,7 +174,7 @@ foreach ($row in $csvData) {
         }
     }
     else {
-        Write-Verbose "Row $rowIndex - No valid file match found for: $csvSongTitle"
+        Write-Error "Row $rowIndex - No file found for: $csvSongTitle"
         $numFilesNotFound++
     }
 }
