@@ -18,31 +18,34 @@ When there are multiple songs with the same name, the file metadata will be insp
 When the `Artist Name 1` column is a list of contributing artists, it's unclear what the Album Artist should be. These files will be moved into a "Various Artists" folder, but this behavior can be overridden per album.
 
 ## How to Use 
-1. Extract all of the zip files into a single directory.
-2. Review the `music uploads metadata.csv` file and make sure it has the values you generally expect. It should be found under<br>`Takeout\YouTube and YouTube Music\music (library and uploads)`.
-3. Add manual overrides for Album Artist as necessary
-    1. Pay particular attention to the values in the `Artist 1` column.<br>To prevent artists named with `,\/&;` from being treated as "Various Artists", open `config.ps1` and add them to the `AlbumArtists` array.
-    2. To find these, you can run this pipeline:
-        ````pwsh
-        Import-Csv "yourpath\music uploads metadata.csv" | Group-Object "Artist Name 1" | Where-Object {$_.Name -match '[,\/&;]'}
-        ````
-    3. There might be harder-to-detect scenarios where one compilation album has many individual artist names. In these cases, you can override the album artist on a per-album basis.<br>Open `config.ps1` and update the `OverrideAlbumArtists` map. The value on the left is the album name, and the value on the right is the album artist to use.
-4. Clone this repository onto your machine
+1. Clone this repository onto your machine.
    ```pwsh
    git clone https://github.com/almighty-loaf/youtube-music-takeout-organizer.git
    ```
-5. Invoke `main.ps1` from the terminal with the following arguments:
+2. Extract all of the zip files into a single directory.
+3. Identify the folder that contains the music files and `music uploads metadata.csv`. It should be found under<br>`Takeout\YouTube and YouTube Music\music (library and uploads)`.
+4. Sort the CSV by album, since it's otherwise random and difficult to manually peruse
+   ````pwsh
+   .\sortCSV.ps1 "C:\yourpath\music uploads metadata.csv"
+   ````
+5. Add manual overrides for Album Artist as necessary
+    1. Pay particular attention to the values in the `Artist 1` column.<br>To prevent artists named with `,\/&;` from being treated as "Various Artists", open `config.ps1` and add them to the `AlbumArtists` array.
+    2. To find these, you can run this pipeline:
+        ````pwsh
+        Import-Csv "C:\yourpath\music uploads metadata.csv" | Group-Object "Artist Name 1" | Where-Object {$_.Name -match '[,\/&;]'}
+        ````
+    3. There might be harder-to-detect scenarios where one compilation album has many individual artist names. In these cases, you can override the album artist on a per-album basis.<br>Open `config.ps1` and update the `OverrideAlbumArtists` map. The value on the left is the album name, and the value on the right is the album artist to use.
+6. Run the main script with the following arguments:
    - `MusicPath` **(Required)** - the path to the immediate directory containing the music files
    - `Verbose` - show messages whenever a song can't be organized
    - `Debug` - show album artist names being overridden and files moved (recommend redirecting output to a file in this case via `*>` stream redirector)
 
     For example:
     ```pwsh
-    .\main.ps1 -MusicPath "C:\somepath\music (library and uploads)" -Verbose
+    .\main.ps1 -MusicPath "C:\yourpath\music uploads metadata.csv" -Verbose
     ```
-6. Spot-check the folders to make sure that the artists and albums were identified correctly, and make any necessary adjustments.
 7. Manually organize any remaining unprocessed files.
-8. Manually organize the Various Artists folder as necessary.
+8.  Manually organize the Various Artists folder as necessary.
 9.  Update file names and metadata as necessary. (Mp3Tag, MusicBrainz Picard, etc.)
 10. Move the folders to their final destination.
 11. ***Highly Recommended*** - Create a proper backup strategy for your music so that you never have to export from YouTube Music again. 😉

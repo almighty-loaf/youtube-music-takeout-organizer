@@ -8,7 +8,12 @@ param (
 . .\config.ps1
 . .\helpers.ps1
 
-$csvPath = Join-Path $MusicPath "music uploads metadata.csv"
+# Allow providing the CSV file directly or inferring it from the music path
+if ($MusicPath.EndsWith("music uploads metadata.csv")) { 
+    $csvPath = $MusicPath
+    $MusicPath = Split-Path $MusicPath -Parent
+} 
+else { $csvPath = Join-Path $MusicPath "music uploads metadata.csv" }
 
 $numFilesOrganized = 0
 $numFilesSkipped = 0
