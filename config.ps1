@@ -2,14 +2,6 @@
 # CONFIGURATION
 #############################################
 
-Set-Variable -Name overrideAlbumArtists -Option constant -Value @{
-    "Super Smash Bros. for Nintendo 3DS/Wii U" = "Nintendo";
-    "Hamilton (Original Broadway Cast Recording)" = "Hamilton (Original Broadway Cast Recording)";
-    "L.a. Noire Official Soundtrack" = "L.A. Noire Official Soundtrack";
-    "Fallout 3: The Unofficial Soundtrack" = "Fallout 3: The Unofficial Soundtrack";
-    "Dr. Horrible's Sing-Along Blog" = "Dr. Horrible's Sing-Along Blog";
-}
-
 # This utility only cares about Album Artists since that's how it groups the albums.
 # However, YTMusic often puts contributing artists in the "Artist Name 1" column of the CSV.
 # These often look like "Name1, Name2" or "Name1 / Name2" and are not consistent across
@@ -19,8 +11,18 @@ Set-Variable -Name overrideAlbumArtists -Option constant -Value @{
 # For this reason, any artist names that contain any of ,;/& will be grouped under
 # "Various Artists" by default.
 #
-# !! Add exceptions here:
-Set-Variable -Name albumArtists -Option constant -Value @(
+Set-Variable -Name AlbumArtists -Option constant -Value @(
     "AC/DC",
     "Earth, Wind & Fire"
+    # Add yours here (no trailing comma on the last item)
 )
+
+# Some albums have only contributing artists listed.
+# Normally they will be grouped under "Various Artists", but you can add overrides here
+# so that specific albums get specific album artists.
+#
+# !! Add yours here:
+Set-Variable -Name OverrideAlbumArtists -Option constant -Value @{
+    "Super Smash Bros. for Nintendo 3DS/Wii U" = "Nintendo";
+    # Add yours here
+}

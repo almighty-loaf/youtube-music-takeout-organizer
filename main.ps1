@@ -48,6 +48,7 @@ catch {
 
 $rowIndex = 1   # starting at 1 allows the first run of the loop to increment past the header row (basically element 0 is row 2)
 foreach ($row in $csvData) {
+    Write-Progress -Activity "Organizing music files" -Status "Item $rowIndex of $($csvData.Count)" -PercentComplete ($rowIndex / $csvData.Count * 100)
     $rowIndex++
 
     # 1. Extract and Sanitize Data
@@ -68,17 +69,15 @@ foreach ($row in $csvData) {
         continue 
     }
 
-    if ($overrideAlbumArtists.ContainsKey($csvAlbumTitle)) {
-        $csvArtistName = $overrideAlbumArtists[$csvAlbumTitle]
+    if ($OverrideAlbumArtists.ContainsKey($csvAlbumTitle)) {
+        $csvArtistName = $OverrideAlbumArtists[$csvAlbumTitle]
         Write-Verbose "Row $rowIndex - Overriding artist name for album ""$csvAlbumTitle"" to ""$csvArtistName"""
     }
 
     # Skip artists with commas or slashes in their name that aren't
     # in the allowed list, since these need to be fixed manually
     elseif ((Test-ArtistNameMightBeList $csvArtistName) `
-            -and -not ($albumArtists -contains $csvArtistName)) {
-        #Write-Verbose "Skipping song with apparent list of artists: $csvArtistName"
-        #$numFilesSkipped++
+            -and -not ($AlbumArtists -contains $csvArtistName)) {
 
         Write-Verbose "Row $rowIndex - Treating ""$csvArtistName"" as ""Various Artists"""
         $csvArtistName = "Various Artists"
