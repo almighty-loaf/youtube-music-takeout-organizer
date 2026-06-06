@@ -1,12 +1,12 @@
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $true)]
-    [string]$CsvPath
+    [string]$MusicPath
 )
 
 # Allow providing the CSV file directly or inferring it from the music path
-if ($CsvPath.EndsWith("music uploads metadata.csv")) { $csvPath = $CsvPath } 
-else { $csvPath = Join-Path $CsvPath "music uploads metadata.csv" }
+if ($MusicPath.EndsWith("music uploads metadata.csv")) { $csvPath = $MusicPath } 
+else { $csvPath = Join-Path $MusicPath "music uploads metadata.csv" }
 
 if (-not (Test-Path $csvPath)) { Write-Error "File not found"; exit }
 

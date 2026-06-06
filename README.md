@@ -26,13 +26,13 @@ When the `Artist Name 1` column is a list of contributing artists, it's unclear 
 3. Identify the folder that contains the music files and `music uploads metadata.csv`. It should be found under<br>`Takeout\YouTube and YouTube Music\music (library and uploads)`.
 4. Sort the CSV by album, since it's otherwise random and difficult to manually peruse
    ````pwsh
-   .\sortCSV.ps1 "C:\yourpath\music uploads metadata.csv"
+   .\sortCSV.ps1 "C:\yourpath\music (library and uploads)"
    ````
 5. Add manual overrides for Album Artist as necessary
     1. Pay particular attention to the values in the `Artist 1` column.<br>To prevent artists named with `,\/&;` from being treated as "Various Artists", open `config.ps1` and add them to the `AlbumArtists` array.
     2. To find these, you can run this pipeline:
         ````pwsh
-        Import-Csv "C:\yourpath\music uploads metadata.csv" | Group-Object "Artist Name 1" | Where-Object {$_.Name -match '[,\/&;]'}
+        Import-Csv "C:\yourpath\music (library and uploads)\music uploads metadata.csv" | Group-Object "Artist Name 1" | Where-Object {$_.Name -match '[,\/&;]'}
         ````
     3. There might be harder-to-detect scenarios where one compilation album has many individual artist names. In these cases, you can override the album artist on a per-album basis.<br>Open `config.ps1` and update the `OverrideAlbumArtists` map. The value on the left is the album name, and the value on the right is the album artist to use.
 6. Run the main script with the following arguments:
@@ -42,7 +42,7 @@ When the `Artist Name 1` column is a list of contributing artists, it's unclear 
 
     For example:
     ```pwsh
-    .\main.ps1 -MusicPath "C:\yourpath\music uploads metadata.csv" -Verbose
+    .\main.ps1 -MusicPath "C:\yourpath\C:\yourpath\music (library and uploads)" -Verbose
     ```
 7. Manually organize any remaining unprocessed files.
 8.  Manually organize the Various Artists folder as necessary.
@@ -55,7 +55,7 @@ When the `Artist Name 1` column is a list of contributing artists, it's unclear 
 - When multiple songs have the same name and duration, it might not be possible to distinguish them. This is most likely for scenarios where song are effectively duplicates, perhaps one from the original album and another from a "Greatest Hits" compilation.
   - To show all overlapping names, you can run this:
     ```pwsh
-    Import-Csv "yourpath\music uploads metadata.csv" | Group-Object "Song Title" | Where-Object { $_.Count -gt 1}
+    Import-Csv "C:\yourpath\music (library and uploads)\music uploads metadata.csv" | Group-Object "Song Title" | Where-Object { $_.Count -gt 1}
     ```
 - There are some instances where song durations in the CSV don't match the duration in their respective files. There is a 3 second window to account for this, but any larger discrepancies might result in files being skipped.
   
