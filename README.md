@@ -27,7 +27,11 @@ When the `Artist Name 1` column is a list of contributing artists, it's unclear 
         Import-Csv "yourpath\music uploads metadata.csv" | Group-Object "Artist Name 1" | Where-Object {$_.Name -match '[,\/&;]'}
         ````
     3. There might be harder-to-detect scenarios where one compilation album has many individual artist names. In these cases, you can override the album artist on a per-album basis.<br>Open `config.ps1` and update the `OverrideAlbumArtists` map. The value on the left is the album name, and the value on the right is the album artist to use.
-4. Invoke the script from the terminal with the following arguments:
+4. Clone this repository onto your machine
+   ```pwsh
+   git clone https://github.com/almighty-loaf/youtube-music-takeout-organizer.git
+   ```
+5. Invoke `main.ps1` from the terminal with the following arguments:
    - `MusicPath` **(Required)** - the path to the immediate directory containing the music files
    - `Verbose` - show messages whenever a song can't be organized
    - `Debug` - show album artist names being overridden and files moved (recommend redirecting output to a file in this case via `*>` stream redirector)
@@ -36,12 +40,12 @@ When the `Artist Name 1` column is a list of contributing artists, it's unclear 
     ```pwsh
     .\main.ps1 -MusicPath "C:\somepath\music (library and uploads)" -Verbose
     ```
-5. Spot-check the folders to make sure that the artists and albums were identified correctly, and make any necessary adjustments.
-6. Manually organize any remaining unprocessed files.
-7. Manually organize the Various Artists folder as necessary.
-8. Update file names and metadata as necessary. (Mp3Tag, MusicBrainz Picard, etc.)
-9. Move the folders to their final destination.
-10. ***Highly Recommended*** - Create a proper backup strategy for your music so that you never have to export from YouTube Music again. 😉
+6. Spot-check the folders to make sure that the artists and albums were identified correctly, and make any necessary adjustments.
+7. Manually organize any remaining unprocessed files.
+8. Manually organize the Various Artists folder as necessary.
+9.  Update file names and metadata as necessary. (Mp3Tag, MusicBrainz Picard, etc.)
+10. Move the folders to their final destination.
+11. ***Highly Recommended*** - Create a proper backup strategy for your music so that you never have to export from YouTube Music again. 😉
 
 ## Limitations
 - This script can only read file metadata within Windows, which can result in more files being skipped when run on Linux or macOS.
