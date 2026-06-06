@@ -13,20 +13,21 @@ This PowerShell script will reorganize the files in an `Album Artist > Album > S
 ## How It Works
 This script parses the CSV one row at a time, determines which file is the best match, and then uses the `Artist Name 1` and `Album Title` columns to move it to the correct destination folder.
 
-When a song name is unique, this can be handled trivially. When there are multiple songs with the same name, or multiple songs share the same clobbered filename, the CSV data will be compared to the available file metadata. The song duration is usually enough to identify a particular file, but when artist or album are present, those are required to match as well.
+When there are multiple songs with the same name, the file metadata will be inspected for comparison with the CSV data. (The song duration is usually enough to identify a particular file, but when artist or album are present, those are required to match as well.)
 
-Although the `Artist Name 1` column is often the album artist, in some cases it is instead a list of contributing artists. To avoid organizing affected files incorrectly, these songs will be skipped unless the artist name is added to an exception list.
+When the `Artist Name 1` column is a list of contributing artists, it's unclear what the Album Artist should be. These files will be moved into a "Various Artists" folder, but this behavior can be overridden per album.
 
 ## How to Use 
-1. Extract all of the zip files into a single directory. Find the folder with the music files and `music uploads metadata.csv`, generally under<br>`Takeout\YouTube and YouTube Music\music (library and uploads)`.
-2. Open this CSV and review the data for accuracy.
-    - Pay particular attention to the values in the `Artist 1` column. In the rare cases where the album artist name actually has commas, slashes, ampersands, and/or semicolons in their name, open the script and add them to the `$artistNamesWithSpecialChars` array at the top of the file. In other cases, you might decide to replace the value with the appropriate album artist.
-    - To find these, you can run this pipeline:
+1. Extract all of the zip files into a single directory.
+2. Review the `music uploads metadata.csv` file and make sure it has the values you generally expect. It should be found under<br>`Takeout\YouTube and YouTube Music\music (library and uploads)`.
+3. Add manual overrides for Album Artist as necessary
+    1. Pay particular attention to the values in the `Artist 1` column.<br>To prevent artists named with `,\/&;` from being treated as "Various Artists", open `config.ps1` and add them to the `AlbumArtists` array.
+    2. To find these, you can run this pipeline:
         ````pwsh
-        Import-Csv "yourpath\music uploads metadata.csv" | Group-Object "Artist Name 1" | Where-Object {$_.Name -match '[,&\/]'}
+        Import-Csv "yourpath\music uploads metadata.csv" | Group-Object "Artist Name 1" | Where-Object {$_.Name -match '[,\/&;]'}
         ````
-
-3. Invoke the script from the terminal with the following arguments:
+    3. There might be harder-to-detect scenarios where one compilation album has many individual artist names. In these cases, you can override the album artist on a per-album basis.<br>Open `config.ps1` and update the `OverrideAlbumArtists` map. The value on the left is the album name, and the value on the right is the album artist to use.
+4. Invoke the script from the terminal with the following arguments:
    - `MusicPath` **(Required)** - the path to the immediate directory containing the music files
    - `Verbose` - include to show messages whenever a song can't be organized
 
@@ -35,12 +36,12 @@ Although the `Artist Name 1` column is often the album artist, in some cases it 
     .\organizer.ps1 -MusicPath "yourpath\music (library and uploads)" -Verbose
     ```
 
-4. Spot-check the folders to make sure that the artists and albums were identified correctly, and make any necessary adjustments.
+5. Spot-check the folders to make sure that the artists and albums were identified correctly, and make any necessary adjustments.
    - If your library contains soundtracks with songs credited to a single artist, that artist probably received their own folder.
-5. Manually organize any remaining unprocessed files.
-6. Update file names and metadata as necessary. (Mp3Tag, MusicBrainz Picard, etc.)
-7. Move the folders to their final destination.
-8. ***Highly Recommended*** - Create a proper backup strategy for your music so that you never have to export from YTM again. 😉
+6. Manually organize any remaining unprocessed files.
+7. Update file names and metadata as necessary. (Mp3Tag, MusicBrainz Picard, etc.)
+8. Move the folders to their final destination.
+9.  ***Highly Recommended*** - Create a proper backup strategy for your music so that you never have to export from YTM again. 😉
 
 ## Limitations
 - This script can only read file metadata within Windows, which can result in more files being skipped when run on Linux or macOS.
@@ -52,8 +53,6 @@ Although the `Artist Name 1` column is often the album artist, in some cases it 
 - There are some instances where song durations in the CSV are incorrect and do not match the durations of their respective files. There is a 3 second window to account for this, but any larger discrepancies might result in files being skipped.
 - This script is not designed to be run multiple times on the same dataset.
 - 
-## TODO
-- Figure out why it says that 6 files were organized on re-run when nothing changed. maybe cuz not running on real data
   
 ## Enhancement Opportunities
 - Make this script more cross-platform by using TagLib# or ffprobe to read file metadata
