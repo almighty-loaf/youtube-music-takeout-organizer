@@ -99,10 +99,9 @@ foreach ($row in $csvData) {
         continue
     }
 
-    $targetFile = $null
-
-
+    
     # 3. Filter using metadata as needed
+    $targetFile = $null
 
     # If there's only one candidate, use it. Requiring the map count to agree helps
     # prevent false positives in a partially-organized dataset
