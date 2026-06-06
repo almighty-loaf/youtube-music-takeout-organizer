@@ -57,15 +57,20 @@ foreach ($row in $csvData) {
     $csvDuration = $row.Duration
 
     # Require at least Song Title and Artist Name for matching
-    if (-not $csvSongTitle -or -not $csvArtistName) { 
-        Write-Verbose "Skipping song with missing title or artist, see CSV row $rowIndex" 
+    if (-not $csvSongTitle) { 
+        Write-Verbose "Row $rowIndex - Skipping; missing song title" 
+        $numFilesSkipped++ 
+        continue 
+    }
+    if (-not $csvArtistName) { 
+        Write-Verbose "Row $rowIndex - Skipping; missing artist name" 
         $numFilesSkipped++ 
         continue 
     }
 
     if ($overrideAlbumArtists.ContainsKey($csvAlbumTitle)) {
         $csvArtistName = $overrideAlbumArtists[$csvAlbumTitle]
-        Write-Verbose "Overriding artist name for album ""$csvAlbumTitle"" to ""$csvArtistName"""
+        Write-Verbose "Row $rowIndex - Overriding artist name for album ""$csvAlbumTitle"" to ""$csvArtistName"""
     }
 
     # Skip artists with commas or slashes in their name that aren't
@@ -91,7 +96,7 @@ foreach ($row in $csvData) {
     $candidates = $musicFiles | Where-Object { $_.BaseName -match "^$escapedTitle(\(\d+\))?$" }
 
     if (-not $candidates) {
-        Write-Verbose "No file candidates found for: $csvSongTitle"
+        Write-Verbose "Row $rowIndex - No file candidates found for: $csvSongTitle"
         $numFilesNotFound++
         continue
     }
@@ -165,12 +170,12 @@ foreach ($row in $csvData) {
             $numFilesOrganized++
         }
         catch {
-            Write-Error "Failed to move ""$csvSongTitle"" to $destPath"
+            Write-Error "Row $rowIndex - Failed to move ""$csvSongTitle"" to $destPath"
             $numFilesErrored++
         }
     }
     else {
-        Write-Verbose "No valid file match found for: $csvSongTitle"
+        Write-Verbose "Row $rowIndex - No valid file match found for: $csvSongTitle"
         $numFilesNotFound++
     }
 }

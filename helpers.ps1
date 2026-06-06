@@ -84,6 +84,7 @@ function UnderscoreCharsRegex {
 # Replaces invalid characters in file names with underscores
 function ConvertTo-SafeFileName {
     param ([string]$name)    
+    $name = $name.Substring(0, [System.Math]::Min(47, $name.Length)) # Exports only use the first 47 characters
     return ($name -replace (UnderscoreCharsRegex), '_')
 }
 

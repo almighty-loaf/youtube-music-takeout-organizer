@@ -4,14 +4,14 @@ param (
 )
 
 # Move all files back to the music root
-Get-ChildItem -Path $MusicPath -File -Recurse | ForEach-Object {
+Get-ChildItem -LiteralPath $MusicPath -File -Recurse | ForEach-Object {
     # Ensure we don't try to move files already in the root
     if ($_.DirectoryName -ne $MusicPath) {
-        Move-Item -Path $_.FullName -Destination $MusicPath -Force
+        Move-Item -LiteralPath $_.FullName -Destination $MusicPath -Force
     }
 }
 
 # Delete all now-empty subdirectories
-Get-ChildItem -Path $MusicPath -Directory | ForEach-Object {
-    Remove-Item -Path $_.FullName -Recurse
+Get-ChildItem -LiteralPath $MusicPath -Directory | ForEach-Object {
+    Remove-Item -LiteralPath $_.FullName -Recurse
 }
