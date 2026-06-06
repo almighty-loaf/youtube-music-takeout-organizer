@@ -14,7 +14,7 @@ param (
 # rows unless specified here
 #
 # You may add more entries here as needed for your own music library
-$artistNamesWithSpecialChars = @(
+$albumArtists = @(
     "AC/DC",
     "Earth, Wind & Fire"
 )
@@ -23,13 +23,6 @@ $artistNamesWithSpecialChars = @(
 #############################################
 # HELPER FUNCTIONS
 #############################################
-
-# Regex pattern that represent characters that YTM replaces with underscores in file names
-# e.g. song title "Who can it be now?" is "Who can it be now_.mp3"
-# Hardcode to the Windows limitations since that's what the source data abides by
-function UnderscoreCharsRegex {
-    '[\\/:*?"''<>|]'
-}
 
 # Function to read MP3 metadata properties
 # Only works for Windows since it relies on Shell.Application COM object, but could be
@@ -101,15 +94,23 @@ function Convert-ShellDurationToSeconds {
     return [int]$durationString
 }
 
-# Function to sanitize file or folder names by replacing invalid characters with underscores
-# and removing trailing dots and spaces (since those are not allowed in Windows file/folder names)
-function ConvertTo-SafeFileOrFolderName {
-    param ([string]$name)    
-    return ($name -replace (UnderscoreCharsRegex), '_').TrimEnd('.', ' ')
+# Regex pattern that represent characters that YTM replaces with underscores in file names
+# e.g. song title "Who can it be now?" is "Who can it be now_.mp3"
+# Hardcode to the Windows limitations since that's what the source data abides by
+function UnderscoreCharsRegex {
+    '[\\/:*?"''<>|]'
 }
 
-# Function that calculates the count of unique song titles after they have been sanitized
-# Output is a map of title->count
+# Replaces invalid characters in file or folder names with underscores and
+# removes trailing dots and spaces (since those are not allowed in Windows file/folder names)
+function ConvertTo-SafeFileOrFolderName {
+    param ([string]$name)    
+    if ($IsWindows) { $name = $name.TrimEnd('.', ' ') }
+    return ($name -replace (UnderscoreCharsRegex), '_')
+}
+
+# Calculates the number of times each song title appears
+# The count is saved in a title->count map using a safe title
 function Get-SafeTitleCountMap {
     param ([array]$csvData)
 
@@ -124,10 +125,13 @@ function Get-SafeTitleCountMap {
 }
 
 # Function to check if an artist name contains special characters that would require manual fixing
-function Test-ArtistNameContainsSpecialChars {
+function Test-ArtistNameMightBeList {
     param ([string]$artistName)
     return ($artistName -match "[,\/&;]")
 }
+
+
+
 
 #############################################
 # SETUP
@@ -185,8 +189,8 @@ foreach ($row in $csvData) {
 
     # Skip artists with commas or slashes in their name that aren't
     # in the allowed list, since these need to be fixed manually
-    if ((Test-ArtistNameContainsSpecialChars $csvArtistName) `
-            -and -not ($artistNamesWithSpecialChars -contains $csvArtistName)) {
+    if ((Test-ArtistNameMightBeList $csvArtistName) `
+            -and -not ($albumArtists -contains $csvArtistName)) {
         Write-Verbose "Skipping song with apparent list of artists: $csvArtistName"
         $numFilesSkipped++
         continue
