@@ -158,7 +158,7 @@ foreach ($row in $csvData) {
                 New-Item -ItemType Directory -Path $destPath | Out-Null
             }
 
-            Move-Item -Path $targetFile.FullName -Destination $destPath -Force -ErrorAction Stop
+            Move-Item -LiteralPath $targetFile.FullName -Destination $destPath -Force -ErrorAction Stop -WarningAction Stop
             
             Write-Debug "Moved: $($targetFile.Name) -> $safeArtist\$safeAlbum"
             
