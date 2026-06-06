@@ -3,7 +3,11 @@
 #############################################
 
 $overrideAlbumArtists = @{
-    "Super Smash Bros. for Nintendo 3DS/Wii U" = "Nintendo"
+    "Super Smash Bros. for Nintendo 3DS/Wii U" = "Nintendo";
+    "Hamilton (Original Broadway Cast Recording)" = "Hamilton (Original Broadway Cast Recording)";
+    "L.a. Noire Official Soundtrack" = "L.A. Noire Official Soundtrack";
+    "Fallout 3: The Unofficial Soundtrack" = "Fallout 3: The Unofficial Soundtrack";
+    "Dr. Horrible's Sing-Along Blog" = "Dr. Horrible's Sing-Along Blog";
 }
 
 # This utility only cares about Album Artists since that's how it groups the albums.

@@ -53,7 +53,7 @@ Although the `Artist Name 1` column is often the album artist, in some cases it 
 - This script is not designed to be run multiple times on the same dataset.
 - 
 ## TODO
-- Figure out why it says that 6 files were organized on re-run when nothing changed
+- Figure out why it says that 6 files were organized on re-run when nothing changed. maybe cuz not running on real data
   
 ## Enhancement Opportunities
 - Make this script more cross-platform by using TagLib# or ffprobe to read file metadata
@@ -61,4 +61,5 @@ Although the `Artist Name 1` column is often the album artist, in some cases it 
 - Add a second pass through the CSV that attempts to handle "stragglers" which couldn't originally be matched, but can now that there is only one viable candidate
 - Remove organized songs from the CSV after completion, to make manual cleanup simpler and allow the script to be run multiple times
 - More intelligently handle a list of contributing artists by matching on album name instead?
+  - Or preprocess step that looks for albums with more than 1 listed artist, and automatic/manual update to set album artist
 - Detect multi-artist compilation/soundtrack albums where each individual song has a single artist, and group them under one artist folder

@@ -81,9 +81,15 @@ function UnderscoreCharsRegex {
     '[\\/:*?"''<>|]'
 }
 
-# Replaces invalid characters in file or folder names with underscores and
-# removes trailing dots and spaces (since those are not allowed in Windows file/folder names)
-function ConvertTo-SafeFileOrFolderName {
+# Replaces invalid characters in file names with underscores
+function ConvertTo-SafeFileName {
+    param ([string]$name)    
+    return ($name -replace (UnderscoreCharsRegex), '_')
+}
+
+# Replaces invalid characters in folder names with underscores
+# Also removes trailing dots and spaces
+function ConvertTo-SafeFolderName {
     param ([string]$name)    
     if ($IsWindows) { $name = $name.TrimEnd('.', ' ') }
     return ($name -replace (UnderscoreCharsRegex), '_')
@@ -96,7 +102,7 @@ function Get-SafeTitleCountMap {
 
     $map = @{}
     foreach ($row in $csvData) {
-        $safeSongTitle = ConvertTo-SafeFileOrFolderName $row.'Song Title'
+        $safeSongTitle = ConvertTo-SafeFileName $row.'Song Title'
 
         if (!$safeSongTitle) { continue }
         $map[$safeSongTitle] = $map[$safeSongTitle] + 1

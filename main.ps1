@@ -51,13 +51,13 @@ foreach ($row in $csvData) {
     $rowIndex++
 
     # 1. Extract and Sanitize Data
-    $csvsafeSongTitle = $row.'Song Title'
+    $csvSongTitle = $row.'Song Title'
     $csvAlbumTitle = $row.'Album Title'
     $csvArtistName = $row.'Artist Name 1'
     $csvDuration = $row.Duration
 
     # Require at least Song Title and Artist Name for matching
-    if (-not $csvsafeSongTitle -or -not $csvArtistName) { 
+    if (-not $csvSongTitle -or -not $csvArtistName) { 
         Write-Verbose "Skipping song with missing title or artist, see CSV row $rowIndex" 
         $numFilesSkipped++ 
         continue 
@@ -81,28 +81,29 @@ foreach ($row in $csvData) {
     }
 
     # Sanitize for file system matching and folder creation
-    $safesafeSongTitle = ConvertTo-SafeFileOrFolderName $csvsafeSongTitle
-    $safeArtist = ConvertTo-SafeFileOrFolderName $csvArtistName
-    $safeAlbum = if ($csvAlbumTitle) { ConvertTo-SafeFileOrFolderName $csvAlbumTitle } else { "Unknown Album" }
+    $safeSongTitle = ConvertTo-SafeFileName $csvSongTitle
+    $safeArtist = ConvertTo-SafeFolderName $csvArtistName
+    $safeAlbum = if ($csvAlbumTitle) { ConvertTo-SafeFolderName $csvAlbumTitle } else { "Unknown Album" }
 
     # 2. Identify Potential Files
     # Matches "Title", "Title(1)", "Title(2)" etc. (No space before parenthesis)
-    $escapedTitle = [regex]::Escape($safesafeSongTitle)
+    $escapedTitle = [regex]::Escape($safeSongTitle)
     $candidates = $musicFiles | Where-Object { $_.BaseName -match "^$escapedTitle(\(\d+\))?$" }
 
     if (-not $candidates) {
-        Write-Verbose "No file candidates found for: $csvsafeSongTitle"
+        Write-Verbose "No file candidates found for: $csvSongTitle"
         $numFilesNotFound++
         continue
     }
 
     $targetFile = $null
 
+
     # 3. Filter using metadata as needed
 
     # If there's only one candidate, use it. Requiring the map count to agree helps
     # prevent false positives in a partially-organized dataset
-    if ($candidates.Count -eq 1 -and $safeTitleCounts[$safesafeSongTitle] -eq 1) {
+    if ($candidates.Count -eq 1 -and $safeTitleCounts[$safeSongTitle] -eq 1) {
         $targetFile = $candidates[0]
     }
 
@@ -114,17 +115,17 @@ foreach ($row in $csvData) {
             $meta = Get-FileMetadata $file.FullName
 
             # Check Title
-            if ($meta.Title -and $meta.Title -ne $csvsafeSongTitle) {
+            if ($meta.Title -and ($meta.Title -ne $csvSongTitle)) {
                 continue
             }
 
             # Check Album
-            if ($meta.Album -and $meta.Album -ne $csvAlbumTitle) {
+            if ($meta.Album -and ($meta.Album -ne $csvAlbumTitle)) {
                 continue
             }
 
             # Check Album Artist
-            if ($meta.AlbumArtist -and $meta.AlbumArtist -ne $csvArtistName) {
+            if ($meta.AlbumArtist -and ($meta.AlbumArtist -ne $csvArtistName)) {
                 continue
             }
 
@@ -147,6 +148,7 @@ foreach ($row in $csvData) {
         }
     }    
 
+
     # 4. Move File
     if ($targetFile) {
         $destPath = Join-Path $MusicPath $safeArtist $safeAlbum
@@ -157,16 +159,18 @@ foreach ($row in $csvData) {
             }
 
             Move-Item -Path $targetFile.FullName -Destination $destPath -Force -ErrorAction Stop
-            # Write-Host "Moved: $($targetFile.Name) -> $safeArtist\$safeAlbum"
+            
+            Write-Debug "Moved: $($targetFile.Name) -> $safeArtist\$safeAlbum"
+            
             $numFilesOrganized++
         }
         catch {
-            Write-Error "Failed to move song to $destPath"
+            Write-Error "Failed to move ""$csvSongTitle"" to $destPath"
             $numFilesErrored++
         }
     }
     else {
-        Write-Verbose "No valid file match found for: $csvsafeSongTitle"
+        Write-Verbose "No valid file match found for: $csvSongTitle"
         $numFilesNotFound++
     }
 }
