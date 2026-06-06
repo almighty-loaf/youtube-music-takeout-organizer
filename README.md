@@ -29,36 +29,33 @@ When the `Artist Name 1` column is a list of contributing artists, it's unclear 
     3. There might be harder-to-detect scenarios where one compilation album has many individual artist names. In these cases, you can override the album artist on a per-album basis.<br>Open `config.ps1` and update the `OverrideAlbumArtists` map. The value on the left is the album name, and the value on the right is the album artist to use.
 4. Invoke the script from the terminal with the following arguments:
    - `MusicPath` **(Required)** - the path to the immediate directory containing the music files
-   - `Verbose` - include to show messages whenever a song can't be organized
+   - `Verbose` - show messages whenever a song can't be organized
+   - `Debug` - show album artist names being overridden and files moved (recommend redirecting output to a file in this case via `*>` stream redirector)
 
     For example:
     ```pwsh
-    .\organizer.ps1 -MusicPath "yourpath\music (library and uploads)" -Verbose
+    .\main.ps1 -MusicPath "C:\somepath\music (library and uploads)" -Verbose
     ```
-
 5. Spot-check the folders to make sure that the artists and albums were identified correctly, and make any necessary adjustments.
-   - If your library contains soundtracks with songs credited to a single artist, that artist probably received their own folder.
 6. Manually organize any remaining unprocessed files.
-7. Update file names and metadata as necessary. (Mp3Tag, MusicBrainz Picard, etc.)
-8. Move the folders to their final destination.
-9.  ***Highly Recommended*** - Create a proper backup strategy for your music so that you never have to export from YTM again. 😉
+7. Manually organize the Various Artists folder as necessary.
+8. Update file names and metadata as necessary. (Mp3Tag, MusicBrainz Picard, etc.)
+9. Move the folders to their final destination.
+10. ***Highly Recommended*** - Create a proper backup strategy for your music so that you never have to export from YouTube Music again. 😉
 
 ## Limitations
 - This script can only read file metadata within Windows, which can result in more files being skipped when run on Linux or macOS.
 - When multiple songs have the same name and duration, it might not be possible to distinguish them. This is most likely for scenarios where song are effectively duplicates, perhaps one from the original album and another from a "Greatest Hits" compilation.
-  - To review and address potential cases manually before running the script, you can run this pipeline:
+  - To show all overlapping names, you can run this:
     ```pwsh
     Import-Csv "yourpath\music uploads metadata.csv" | Group-Object "Song Title" | Where-Object { $_.Count -gt 1}
     ```
-- There are some instances where song durations in the CSV are incorrect and do not match the durations of their respective files. There is a 3 second window to account for this, but any larger discrepancies might result in files being skipped.
-- This script is not designed to be run multiple times on the same dataset.
-- 
+- There are some instances where song durations in the CSV don't match the duration in their respective files. There is a 3 second window to account for this, but any larger discrepancies might result in files being skipped.
   
 ## Enhancement Opportunities
-- Make this script more cross-platform by using TagLib# or ffprobe to read file metadata
-- Automatically populate missing file metadata from the CSV
+- Make this script more cross-platform by using `TagLib#` or `ffprobe` to read file metadata
 - Add a second pass through the CSV that attempts to handle "stragglers" which couldn't originally be matched, but can now that there is only one viable candidate
-- Remove organized songs from the CSV after completion, to make manual cleanup simpler and allow the script to be run multiple times
-- More intelligently handle a list of contributing artists by matching on album name instead?
+- Automatically populate missing file metadata from the CSV
+- Automatically detect cases where a large portion of 
   - Or preprocess step that looks for albums with more than 1 listed artist, and automatic/manual update to set album artist
 - Detect multi-artist compilation/soundtrack albums where each individual song has a single artist, and group them under one artist folder

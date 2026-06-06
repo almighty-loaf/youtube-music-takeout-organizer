@@ -60,18 +60,18 @@ foreach ($row in $csvData) {
     # Require at least Song Title and Artist Name for matching
     if (-not $csvSongTitle) { 
         Write-Verbose "Row $rowIndex - Skipping; missing song title" 
-        $numFilesSkipped++ 
+        $numFilesSkipped++
         continue 
     }
     if (-not $csvArtistName) { 
         Write-Verbose "Row $rowIndex - Skipping; missing artist name" 
-        $numFilesSkipped++ 
+        $numFilesSkipped++
         continue 
     }
 
     if ($OverrideAlbumArtists.ContainsKey($csvAlbumTitle)) {
         $csvArtistName = $OverrideAlbumArtists[$csvAlbumTitle]
-        Write-Verbose "Row $rowIndex - Overriding artist name for album ""$csvAlbumTitle"" to ""$csvArtistName"""
+        Write-Debug "Row $rowIndex - Overriding artist name for album ""$csvAlbumTitle"" to ""$csvArtistName"""
     }
 
     # Skip artists with commas or slashes in their name that aren't
@@ -79,7 +79,7 @@ foreach ($row in $csvData) {
     elseif ((Test-ArtistNameMightBeList $csvArtistName) `
             -and -not ($AlbumArtists -contains $csvArtistName)) {
 
-        Write-Verbose "Row $rowIndex - Treating ""$csvArtistName"" as ""Various Artists"""
+        Write-Debug "Row $rowIndex - Treating ""$csvArtistName"" as ""Various Artists"""
         $csvArtistName = "Various Artists"
     }
 
@@ -94,7 +94,7 @@ foreach ($row in $csvData) {
     $candidates = $musicFiles | Where-Object { $_.BaseName -match "^$escapedTitle(\(\d+\))?$" }
 
     if (-not $candidates) {
-        Write-Verbose "Row $rowIndex - No file candidates found for: $csvSongTitle"
+        Write-Error "Row $rowIndex - No file found for ""$csvSongTitle"" by ""$csvArtistName"""
         $numFilesNotFound++
         continue
     }
@@ -173,7 +173,7 @@ foreach ($row in $csvData) {
         }
     }
     else {
-        Write-Error "Row $rowIndex - No file found for: $csvSongTitle"
+        Write-Error "Row $rowIndex - No file found for ""$csvSongTitle"" by ""$csvArtistName"""
         $numFilesNotFound++
     }
 }
