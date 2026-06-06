@@ -2,7 +2,7 @@
 # CONFIGURATION
 #############################################
 
-$overrideAlbumArtists = @{
+Set-Variable -Name overrideAlbumArtists -Option constant -Value @{
     "Super Smash Bros. for Nintendo 3DS/Wii U" = "Nintendo";
     "Hamilton (Original Broadway Cast Recording)" = "Hamilton (Original Broadway Cast Recording)";
     "L.a. Noire Official Soundtrack" = "L.A. Noire Official Soundtrack";
@@ -20,7 +20,7 @@ $overrideAlbumArtists = @{
 # "Various Artists" by default.
 #
 # !! Add exceptions here:
-$albumArtists = @(
+Set-Variable -Name albumArtists -Option constant -Value @(
     "AC/DC",
     "Earth, Wind & Fire"
 )

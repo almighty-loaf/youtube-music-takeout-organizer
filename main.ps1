@@ -35,7 +35,7 @@ if (!$musicFiles.Count) { Write-Error "No music files found in the directory: $M
 
 # Initialize Shell for reading MP3 metadata
 try {
-    $shell = New-Object -ComObject Shell.Application
+    Set-Variable -Name shell -Option constant -Value (New-Object -ComObject Shell.Application)
 }
 catch {
     Write-Warning "Running on non-Windows host. Existing file metadata won't be considered when there are multiple files with the same name."
