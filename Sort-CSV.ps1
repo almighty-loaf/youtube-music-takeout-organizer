@@ -1,4 +1,3 @@
-[CmdletBinding()]
 param (
     [Parameter(Mandatory = $true)]
     [string]$MusicPath,
@@ -8,11 +7,10 @@ param (
     [string]$SortBy = "Album"
 )
 
-# Allow providing the CSV file directly or inferring it from the music path
-if ((Split-Path $MusicPath -Leaf) -eq "music uploads metadata.csv") { $csvPath = $MusicPath } 
-else { $csvPath = Join-Path $MusicPath "music uploads metadata.csv" }
+. .\Helpers.ps1
 
-if (-not (Test-Path $csvPath)) { Write-Error "File not found"; exit }
+$csvPath = Get-CSVFromPath $MusicPath
+if (-not (Test-Path $csvPath -ErrorAction SilentlyContinue)) { Write-Error "Required file cannot be found: '$csvPath'"; exit }
 
 $sortProperty = if ($SortBy -eq "Album") { "Album Title" } else { "Artist Name 1" }
 

@@ -5,15 +5,8 @@ param (
 )
 
 # Sources
-. .\config.ps1
-. .\helpers.ps1
-
-# Allow providing the CSV file directly or inferring it from the music path
-if ($MusicPath.EndsWith("music uploads metadata.csv")) { 
-    $csvPath = $MusicPath
-    $MusicPath = Split-Path $MusicPath -Parent
-} 
-else { $csvPath = Join-Path $MusicPath "music uploads metadata.csv" }
+. .\Config.ps1
+. .\Helpers.ps1
 
 $numFilesOrganized = 0
 $numFilesSkipped = 0
@@ -25,9 +18,10 @@ $numFilesErrored = 0
 # LOAD AND VALIDATE DATA
 #############################################
 
-# Verify paths
-if (-not (Test-Path $MusicPath)) { Write-Error "Music path not found: $MusicPath"; exit }
-if (-not (Test-Path $csvPath)) { Write-Error "music uploads metadata.csv not found in music path: $MusicPath"; exit }
+$csvPath = Get-CSVFromPath $MusicPath
+if (-not (Test-Path $csvPath -ErrorAction SilentlyContinue)) { Write-Error "'music uploads metadata.csv' cannot be found"; exit }
+
+$MusicPath = Split-Path $csvPath -Parent
 
 # Load CSV data
 $csvData = Import-Csv -Path $csvPath

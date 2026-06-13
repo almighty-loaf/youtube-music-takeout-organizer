@@ -111,8 +111,26 @@ function Get-SafeTitleCountMap {
     return $map
 }
 
+# Function to get the regex pattern that matches artist list delimiters
+function Get-ArtistListDelimiter-Regex {
+    return "[,\/&;]"
+}
+
 # Function to check if an artist name contains special characters that would require manual fixing
 function Test-ArtistNameMightBeList {
     param ([string]$artistName)
-    return ($artistName -match "[,\/&;]")
+    return ($artistName -match (Get-ArtistListDelimiter-Regex))
+}
+
+# Function that returns the path to the CSV file, given either the direct path or its containing folder
+# If the path is invalid, return null
+function Get-CSVFromPath {
+    param ([string]$path)
+
+    if (Test-Path $path -PathType Leaf -ErrorAction SilentlyContinue) {
+        return $path
+    } elseif (Test-Path $path -PathType Container -ErrorAction SilentlyContinue) {
+        return Join-Path $path "music uploads metadata.csv"
+    }
+    return $null
 }

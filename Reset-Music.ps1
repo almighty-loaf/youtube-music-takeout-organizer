@@ -3,6 +3,8 @@ param (
     [string]$MusicPath
 )
 
+if (!(Test-Path $MusicPath -ErrorAction SilentlyContinue)) { Write-Error "Path not found: $MusicPath"; exit }
+
 # Move all files back to the music root
 Get-ChildItem -LiteralPath $MusicPath -File -Recurse | ForEach-Object {
     # Ensure we don't try to move files already in the root
@@ -12,6 +14,6 @@ Get-ChildItem -LiteralPath $MusicPath -File -Recurse | ForEach-Object {
 }
 
 # Delete all now-empty subdirectories
-Get-ChildItem -LiteralPath $MusicPath -Directory | ForEach-Object {
+Get-ChildItem -LiteralPath $MusicPath -Directory -ErrorAction SilentlyContinue | ForEach-Object {
     Remove-Item -LiteralPath $_.FullName -Recurse
 }
