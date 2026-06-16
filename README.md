@@ -31,13 +31,13 @@ When the `Artist Name 1` column is a list of contributing artists, it's unclear 
    .\Sort-CSV.ps1 "C:\yourpath\music (library and uploads)\music uploads metadata.csv" -SortBy Album
    ````
 ### Prep Data
-1. Prevent false positives for "Various Artists"
+5. Prevent false positives for "Various Artists"
     ````pwsh
     .\Show-ListArtists.ps1 "C:\yourpath\music (library and uploads)\music uploads metadata.csv"
     ````
     - Any names that appear here contain one or more of `,\/&;`, which indicate a list rather than a true album artist.
     - Add genuine names to the `AlbumArtists` array in `Config.ps1`, and those will be treated as ordinary values.
-2. Normalize album artists
+6. Normalize album artists
     ````pwsh
     .\Show-MultiArtistAlbums.ps1 "C:\yourpath\music (library and uploads)\music uploads metadata.csv" -Count 2
     ````
