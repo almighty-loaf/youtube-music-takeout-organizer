@@ -68,7 +68,7 @@ When the `Artist Name 1` column is a list of contributing artists, it's unclear 
 9. Review the Various Artists folder and reorganize the songs here as needed.
 10. Update file names and metadata tags as needed. (Mp3Tag, MusicBrainz Picard, etc.)
 11. Move the folders to their final destination.
-12. **🔶Highly Recommended!** - Create a proper backup strategy for your music so that you never have to export from YouTube Music again. 😉
+12. **🔶Highly Recommended** - Create a proper backup strategy for your music so that you never have to export from YouTube Music again. 😉
 
 ## Limitations
 - This script can only read file metadata within Windows, which results in more files being skipped when run on Linux or macOS.
