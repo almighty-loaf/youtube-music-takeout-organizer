@@ -1,3 +1,6 @@
+# Reset the music directory to its original state, in case of weird behavior
+# Mostly for debugging
+
 param (
     [Parameter(Mandatory = $true)]
     [string]$MusicPath
