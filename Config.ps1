@@ -20,9 +20,9 @@ Set-Variable -Name AlbumArtists -Option constant -Value @(
     # Add yours here (no trailing comma on the last item)
 )
 
-# In some cases, like compilation albums, each song in an album may have a separate
-# contributing artist.
-# Album Titles listed here will always use the provided artist name 
+# In cases such as compilation albums, each song may have a separate artist credited.
+# Album Titles listed here will always use the provided artist name. This is slightly
+# more convenient than updating the CSV file directly.
 Set-Variable -Name OverrideAlbumArtists -Option constant -Value @{
     # "<Album Title>" = "<Album Artist>";
     "Super Smash Bros. for Nintendo 3DS/Wii U" = "Nintendo";

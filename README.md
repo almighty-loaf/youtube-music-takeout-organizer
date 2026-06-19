@@ -2,14 +2,22 @@
 *This utility organizes the raw dump of YouTube Music Takeout files into a nested hierarchy of Album Artist, Album, and Song*
 
 ## Problem
-If you uploaded your personal music files to YouTube Music and have now downloaded them through Google Takeout, you will have noticed that a ton of file metadata is inconsistently missing. In some cases, only clobbered filenames remain (e.g. track numbers have been removed, certain characters are replaced with underscores).
+YouTube Music Takeout is a bit of a mess and does not reflect the state of your files as you uploaded them. All files live in one folder, filenames have been clobbered, and tag metadata has been stripped seemingly at random.
 
-The Takeout data does include a CSV file that contains the list of exported songs, including columns for title, album, artists, and duration. However, it is left to the user to manually reorganize and retag the files.
-
-This is extremely cumbersome when you are dealing with thousands of songs.
+The Takeout data does include a CSV file that contains the list of exported songs, including columns for title, album, artists, and duration. However, it is left to the user to manually reorganize and retag the files. This is extremely cumbersome when you are dealing with thousands of songs.
 
 ## Solution
-This PowerShell script will reorganize the files in an `Album Artist > Album > Song` folder hierarchy within the music folder root. Any files that aren't able to be organized will remain at the root for manual processing.
+This PowerShell script reorganizes the files in a standard hierarchy within the music folder root. Any files that aren't able to be organized will remain at the root for manual processing.
+
+```
+Artist
+├-Album
+│ ├─Song
+│ └─Song
+└─Album
+  ├─Song
+  └─Song
+```
 
 ## How It Works
 This script parses the CSV one row at a time, determines which file is the best match, and then uses the `Artist Name 1` and `Album Title` columns to move it to the correct destination folder.
@@ -31,13 +39,13 @@ When the `Artist Name 1` column is a list of contributing artists, it's unclear 
    .\Sort-CSV.ps1 "C:\yourpath\music (library and uploads)\music uploads metadata.csv" -SortBy Album
    ````
 ### Prep Data
-1. Prevent false positives for "Various Artists"
+5. Prevent false positives for "Various Artists"
     ````pwsh
     .\Show-ListArtists.ps1 "C:\yourpath\music (library and uploads)\music uploads metadata.csv"
     ````
     - Any names that appear here contain one or more of `,\/&;`, which indicate a list rather than a true album artist.
     - Add genuine names to the `AlbumArtists` array in `Config.ps1`, and those will be treated as ordinary values.
-2. Normalize album artists
+6. Normalize album artists
     ````pwsh
     .\Show-MultiArtistAlbums.ps1 "C:\yourpath\music (library and uploads)\music uploads metadata.csv" -Count 2
     ````
@@ -46,9 +54,9 @@ When the `Artist Name 1` column is a list of contributing artists, it's unclear 
 
 ### Organize
 7. Run the main script with the following arguments:
-   - `MusicPath` - the path to the immediate directory containing the music files
+   - `MusicPath` - follow with the path to the immediate directory containing the music files
    - `Verbose` - include to show messages whenever a song can't be organized
-   - `Debug` - include show album artist names being overridden and files moved (recommend redirecting output to a file in this case via `*>` stream redirector)
+   - `Debug` - include to show album artist names being overridden and files moved (this will be a lot of output, consider redirecting output to a file in this case via `*>` stream redirector)
 
     For example:
     ```pwsh
