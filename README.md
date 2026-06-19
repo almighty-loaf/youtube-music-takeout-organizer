@@ -19,6 +19,8 @@ Artist
   └─Song
 ```
 
+This organization is a good starting point from which to re-tag your songs.
+
 ## How It Works
 This script parses the CSV one row at a time, determines which file is the best match, and then uses the `Artist Name 1` and `Album Title` columns to move it to the correct destination folder.
 
@@ -63,10 +65,10 @@ When the `Artist Name 1` column is a list of contributing artists, it's unclear 
     .\Organize-Music.ps1 -MusicPath "C:\yourpath\music (library and uploads)" -Verbose
     ```
 8. Manually organize any remaining unprocessed files.
-9. Review the Various Artists folder and reorganize the songs here as necessary.
-10. Update file names and metadata if desired. (Mp3Tag, MusicBrainz Picard, etc.)
+9. Review the Various Artists folder and reorganize the songs here as needed.
+10. Update file names and metadata tags as needed. (Mp3Tag, MusicBrainz Picard, etc.)
 11. Move the folders to their final destination.
-12. ***Highly Recommended*** - Create a proper backup strategy for your music so that you never have to export from YouTube Music again. 😉
+12. **🔶Highly Recommended!** - Create a proper backup strategy for your music so that you never have to export from YouTube Music again. 😉
 
 ## Limitations
 - This script can only read file metadata within Windows, which results in more files being skipped when run on Linux or macOS.
