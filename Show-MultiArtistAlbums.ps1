@@ -9,7 +9,10 @@ param (
 . .\Helpers.ps1
 
 $csvPath = Get-CSVFromPath $path
-if (-not (Test-Path $csvPath -ErrorAction SilentlyContinue)) { Write-Error "Required file cannot be found: '$csvPath'"; exit }
+if (-not (Test-Path $csvPath -ErrorAction SilentlyContinue)) { 
+    Write-Error "Required file cannot be found: '$csvPath'"
+    exit
+}
 
 Import-Csv $csvPath | `
     Group-Object -Property "Album Title" | `
