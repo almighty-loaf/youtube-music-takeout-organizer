@@ -2,9 +2,9 @@
 *This utility organizes the raw dump of YouTube Music Takeout files into a nested hierarchy of Album Artist, Album, and Song*
 
 ## Problem
-YouTube Music Takeout is a bit of a mess and does not reflect the state of your files as you uploaded them. All files live in one folder, filenames have been clobbered, and tag metadata has been stripped seemingly at random.
+**YouTube Music Takeout** is a bit of a mess and does not reflect the state of your files as you uploaded them. All exported files live in one folder, filenames have been clobbered, and tag metadata has been stripped seemingly at random.
 
-The Takeout data does include a CSV file that contains the list of exported songs, including columns for title, album, artists, and duration. However, it is left to the user to manually reorganize and retag the files. This is extremely cumbersome when you are dealing with thousands of songs.
+The Takeout data does include a CSV file that contains the list of songs, including columns for title, album, artists, and duration. However, it is left to the user to manually reorganize and retag the files. This is extremely cumbersome when you are dealing with thousands of songs.
 
 ## Solution
 This PowerShell script reorganizes the files in a standard hierarchy within the music folder root. Any files that aren't able to be organized will remain at the root for manual processing.
@@ -24,7 +24,7 @@ This organization is a good starting point from which to re-tag your songs.
 ## How It Works
 This script parses the CSV one row at a time, determines which file is the best match, and then uses the `Artist Name 1` and `Album Title` columns to move it to the correct destination folder.
 
-When there are multiple songs with the same name, the file metadata will be inspected for comparison with the CSV data. (The song duration is usually enough to identify a particular file, but when artist or album are present, those are required to match as well.)
+When there are multiple songs with the same name, the file metadata will be inspected for comparison with the CSV data. (The song duration is usually enough to identify a particular file, but when artist or album are present, those must match as well.)
 
 When the `Artist Name 1` column is a list of contributing artists, it's unclear what the Album Artist should be. These files will be moved into a "Various Artists" folder, but this behavior can be overridden per album.
 
@@ -51,8 +51,9 @@ When the `Artist Name 1` column is a list of contributing artists, it's unclear 
     ````pwsh
     .\Show-MultiArtistAlbums.ps1 "C:\yourpath\music (library and uploads)\music uploads metadata.csv" -Count 2
     ````
-   - Soundtracks and compilations often credit the individual artist for a song rather than the Album Artist, which results in the album getting split across multiple artist folders
-   - Any albums that appear here can be forced to use a specific album artist by editing the `OverrideAlbumArtists` dictionary in `Config.ps1`. 
+   - Songs as part of soundtracks and compilations are often tagged with individual artists rather than Album Artists, which affects the organization process.
+   - Run this script to show any albums that might fit this description. By default, any album with two or more artists will qualify. For large libraries, consider increasing the Count argument to reduce false positives.
+   - Any albums that appear here can be forced to use a specific album artist by editing the `OverrideAlbumArtists` dictionary in `Config.ps1`.
 
 ### Organize
 7. Run the main script with the following arguments:
@@ -68,7 +69,7 @@ When the `Artist Name 1` column is a list of contributing artists, it's unclear 
 9. Review the Various Artists folder and reorganize the songs here as needed.
 10. Update file names and metadata tags as needed. (Mp3Tag, MusicBrainz Picard, etc.)
 11. Move the folders to their final destination.
-12. **🔶Highly Recommended** - Create a proper backup strategy for your music so that you never have to export from YouTube Music again. 😉
+12. 🌟**Highly Recommended**: Create a proper backup strategy so that you never have to export from YouTube Music again. 😉
 
 ## Limitations
 - This script can only read file metadata within Windows, which results in more files being skipped when run on Linux or macOS.
