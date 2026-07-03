@@ -52,7 +52,7 @@ When the `Artist Name 1` column is a list of contributing artists, it's unclear 
     .\Show-MultiArtistAlbums.ps1 "C:\yourpath\music (library and uploads)\music uploads metadata.csv" -Count 2
     ````
    - Songs as part of soundtracks and compilations are often tagged with individual artists rather than Album Artists, which affects the organization process.
-   - Run this script to show any albums that might fit this description. By default, any album with two or more artists will qualify. For large libraries, consider increasing the Count argument to reduce false positives.
+   - Run this script to show any albums that might fit this description. By default, any album with two or more artists will qualify. For large libraries, consider increasing the `Count` to reduce false positives.
    - Any albums that appear here can be forced to use a specific album artist by editing the `OverrideAlbumArtists` dictionary in `Config.ps1`.
 
 ### Organize
